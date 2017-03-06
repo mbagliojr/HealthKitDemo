@@ -1,0 +1,15 @@
+PODS:
+  - DatePickerDialog (1.1.7)
+  - Datez (2.0.1)
+
+DEPENDENCIES:
+  - DatePickerDialog
+  - Datez
+
+SPEC CHECKSUMS:
+  DatePickerDialog: bd5e7e92e4da2c6a8966b28d5f5d8f335d6c2c63
+  Datez: 3a0875cf1f20d06157ebc48f338c05be86ae388c
+
+PODFILE CHECKSUM: 5af1bd6120939c09c52ee231645a469dbec05145
+
+COCOAPODS: 1.0.1
