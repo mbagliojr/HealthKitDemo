@@ -17,7 +17,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var errorLabel: UILabel!
     
-    var results: [HealthKitResult]? = []
+    var results: [HealthKitResult] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,15 +45,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @available(iOS 2.0, *)
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return results?.count ?? 0
+        return results.count
     }
     
     @available(iOS 2.0, *)
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "HealthCell", for: indexPath) as! HealthCell
         
-        cell.value.text = results![indexPath.row].value
-        cell.date.text = results![indexPath.row].label
+        cell.value.text = results[indexPath.row].value
+        cell.date.text = results[indexPath.row].label
         
         return cell
     }
@@ -61,7 +61,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBAction func getHealthKitData(_ sender: Any) {
         
         guard HKHealthStore.isHealthDataAvailable() == true else {
-            toggleErrorVisibility(hidden: true)
+            self.toggleErrorVisibility(hidden: false)
             self.errorLabel.text = "Health kit not available"
             
             return
@@ -88,7 +88,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Request authorization to read and/or write the specific data.
         healthKitStore.requestAuthorization(toShare: nil, read: healthDataToRead) { (success, error) -> Void in
             if(error != nil) {
-                self.toggleErrorVisibility(hidden: true)
+                self.toggleErrorVisibility(hidden: false)
                 self.errorLabel.text = "Error obtaining permission"
                 return
             }
@@ -117,19 +117,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                                             let totalSteps = quantity?.doubleValue(for: unit)
                                                             if(totalSteps != nil) {
                                                                 
-                                                                self.results?.removeAll()
-                                                                self.results?.append(HealthKitResult())
-                                                                self.results?[0].label = String(describing: totalSteps!) + " Steps"
+                                                                self.results.removeAll()
+                                                                self.results.append(HealthKitResult())
+                                                                self.results[0].label = String(describing: totalSteps!) + " Steps"
                                                                 
                                                                 self.tableView.reloadData()
                                                                 self.toggleErrorVisibility(hidden: true)
-                                                                //self.errorLabel.text = "\(total) steps"
                                                             } else {
                                                                 self.toggleErrorVisibility(hidden: false)
                                                                 self.errorLabel.text = "No Data"
                                                             }
                                                         } else {
-                                                            self.toggleErrorVisibility(hidden: true)
+                                                            self.toggleErrorVisibility(hidden: false)
                                                             self.errorLabel.text = "ERROR"
                                                             return
                                                         }
@@ -146,7 +145,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Request authorization to read and/or write the specific data.
         healthKitStore.requestAuthorization(toShare: nil, read: healthDataToRead) { (success, error) -> Void in
             if(error != nil) {
-                self.toggleErrorVisibility(hidden: true)
+                self.toggleErrorVisibility(hidden: false)
                 self.errorLabel.text = "Error obtaining permission"
                 return
             }
@@ -160,7 +159,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let start = df.date(from: startDate.text!)!
         let end = df.date(from: endDate.text!)!
         
-        self.results?.removeAll()
+        self.results.removeAll()
         self.tableView.reloadData()
         
         //  Set the predicate
@@ -193,13 +192,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                         let label = shortFormat.string(from: date)
                         let value = quantity.doubleValue(for: HKUnit.count())
                         
-                        self.results?.append(HealthKitResult())
-                        self.results?.last?.value = String(describing: value)
-                        self.results?.last?.label = label
-                        self.tableView.insertRows(at: [IndexPath(row: (self.results?.count)! - 1, section: 0)], with: .
+                        self.toggleErrorVisibility(hidden: true)
+                        self.results.append(HealthKitResult())
+                        self.results.last?.value = String(describing: value)
+                        self.results.last?.label = label
+                        self.tableView.insertRows(at: [IndexPath(row: self.results.count - 1, section: 0)], with: .
                             automatic)
                     } else {
-                        self.toggleErrorVisibility(hidden: true)
+                        self.toggleErrorVisibility(hidden: false)
                         self.errorLabel.text = "ERROR"
                         return
                     }
@@ -219,7 +219,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Request authorization to read and/or write the specific data.
         healthKitStore.requestAuthorization(toShare: nil, read: healthDataToRead) { (success, error) -> Void in
             if(error != nil) {
-                self.toggleErrorVisibility(hidden: true)
+                self.toggleErrorVisibility(hidden: false)
                 self.errorLabel.text = "Error obtaining permission"
                 return
             }
@@ -233,7 +233,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let start = df.date(from: startDate.text!)!
         let end = df.date(from: endDate.text!)!
         
-        self.results?.removeAll()
+        self.results.removeAll()
         self.tableView.reloadData()
         
         //  Set the predicate
@@ -254,6 +254,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             DispatchQueue.main.async {
                 
                 self.tableView.beginUpdates()
+                self.toggleErrorVisibility(hidden: true)
                 
                 for sample in samples {
                     
@@ -262,10 +263,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     let label = shortFormat.string(from: sample.startDate)
                     let value = sample.quantity.doubleValue(for: HKUnit.count())
                     
-                    self.results?.append(HealthKitResult())
-                    self.results?.last?.value = String(describing: value)
-                    self.results?.last?.label = label
-                    self.tableView.insertRows(at: [IndexPath(row: (self.results?.count)! - 1, section: 0)], with: .
+                    self.results.append(HealthKitResult())
+                    self.results.last?.value = String(describing: value)
+                    self.results.last?.label = label
+                    self.tableView.insertRows(at: [IndexPath(row: self.results.count - 1, section: 0)], with: .
                         automatic)
                 }
                 
